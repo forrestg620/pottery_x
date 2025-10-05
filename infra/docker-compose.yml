@@ -16,6 +16,8 @@ services:
       DATABASE_URL: postgresql+psycopg2://pottery:pottery@db:5432/pottery
     ports: ["8000:8000"]
     depends_on: [db]
+    env_file:
+      - ../backend/.env.dev
   frontend:
     build: ../frontend/pottery-web
     command: npm run dev -- --host
