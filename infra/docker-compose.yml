@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: pottery
+      POSTGRES_USER: pottery
+      POSTGRES_PASSWORD: pottery
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+  backend:
+    build: ../backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes: ["../backend:/app"]
+    working_dir: /app
+    environment:
+      DATABASE_URL: postgresql+psycopg2://pottery:pottery@db:5432/pottery
+    ports: ["8000:8000"]
+    depends_on: [db]
+  frontend:
+    build: ../frontend/pottery-web
+    command: npm run dev -- --host
+    volumes:
+      - ../frontend/pottery-web:/app
+      - /app/node_modules      # keep container’s own node_modules
+    working_dir: /app
+    ports: ["5173:5173"]
+    depends_on: [backend]
+volumes:
+  pgdata:
